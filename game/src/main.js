@@ -71,6 +71,12 @@ function runGame() {
   let medal = '';
   let accumulator = 0;
   let last = performance.now();
+  /**
+   * A flap waits here for the next world step instead of being read once per frame: on a
+   * fast display (120 Hz) half the frames run no step, and a flap read there would be thrown
+   * away unapplied, so taps would silently vanish and Pepe would plunge.
+   */
+  let pendingFlap = false;
 
   // Screen readers (and anyone watching the page's text) hear the screen changes and each event.
   function announce(message) {
@@ -139,15 +145,18 @@ function runGame() {
     last = now;
     const actions = input.takeActions();
     handleActions(actions);
-    const flap = (actions & ACTION_FLAP) !== 0;
-    if (flap && screen === SCREEN_PLAY) sound.flap();
+    const newFlap = (actions & ACTION_FLAP) !== 0;
+    if (newFlap) pendingFlap = true;
+    if (newFlap && screen === SCREEN_PLAY) sound.flap();
     if (screen === SCREEN_TITLE || screen === SCREEN_PLAY) {
       while (accumulator >= STEP && (screen === SCREEN_TITLE || screen === SCREEN_PLAY)) {
-        step(screen === SCREEN_PLAY && flap);
+        step(screen === SCREEN_PLAY && pendingFlap);
+        pendingFlap = false;
         accumulator -= STEP;
       }
     } else {
       accumulator = 0;
+      pendingFlap = false;
     }
     renderer.draw(world.state, screen, best, medal, sound.isMuted());
   }
