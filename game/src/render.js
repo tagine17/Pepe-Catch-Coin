@@ -4,6 +4,7 @@
 // smile, little feet), never an image file. Text that holds a number is rebuilt only when
 // the number changes, so a frame allocates nothing.
 import { COIN, FIELD, FONT, LIVES, PALETTE, PEPE, PIPE } from './config.js';
+import { COIN_ICONS } from './coinIcons.js';
 
 export const SCREEN_TITLE = 'title';
 export const SCREEN_PLAY = 'play';
@@ -150,24 +151,35 @@ export function createRenderer(canvas) {
     context.strokeRect(x - lip + 1.5, lipY, PIPE.width + lip * 2 - 3, cap);
   }
 
+  /** A coin spins like a flipping coin (its width squishes with the spin) and shows one
+   * of the four crypto icons; until its image has decoded it is the old gold circle. */
   function drawCoin(coin) {
-    const squish = Math.abs(Math.cos(coin.spin));
-    const rx = Math.max(3, COIN.radius * squish);
-    context.fillStyle = PALETTE.coinDark;
-    context.beginPath();
-    context.ellipse(coin.x, coin.y, rx + 2, COIN.radius + 2, 0, 0, Math.PI * 2);
-    context.fill();
-    context.fillStyle = PALETTE.coin;
-    context.beginPath();
-    context.ellipse(coin.x, coin.y, rx, COIN.radius, 0, 0, Math.PI * 2);
-    context.fill();
-    if (squish > 0.4) {
+    const squish = Math.max(0.05, Math.abs(Math.cos(coin.spin)));
+    const icon = COIN_ICONS[coin.kind] ?? null;
+    const size = COIN.radius * 2 + 4;
+    context.save();
+    context.translate(coin.x, coin.y);
+    context.scale(squish, 1);
+    if (icon !== null && icon.image.complete && icon.image.naturalWidth > 0) {
+      context.drawImage(icon.image, -size / 2, -size / 2, size, size);
+    } else {
       context.fillStyle = PALETTE.coinDark;
-      context.font = `bold ${Math.round(COIN.radius)}px ${FONT}`;
-      context.textAlign = 'center';
-      context.textBaseline = 'middle';
-      context.fillText('$', coin.x, coin.y + 1);
+      context.beginPath();
+      context.arc(0, 0, COIN.radius + 2, 0, Math.PI * 2);
+      context.fill();
+      context.fillStyle = PALETTE.coin;
+      context.beginPath();
+      context.arc(0, 0, COIN.radius, 0, Math.PI * 2);
+      context.fill();
+      if (squish > 0.4) {
+        context.fillStyle = PALETTE.coinDark;
+        context.font = `bold ${Math.round(COIN.radius)}px ${FONT}`;
+        context.textAlign = 'center';
+        context.textBaseline = 'middle';
+        context.fillText('$', 0, 1);
+      }
     }
+    context.restore();
   }
 
   /** Pepe: a round green frog with eye bumps, a wide smile and kicking feet, tilted by his flight. */
@@ -299,7 +311,7 @@ export function createRenderer(canvas) {
   }
 
   const TITLE_LINES = [
-    'Flap Pepe through the pipe gates. Catch the gold coins.',
+    'Flap Pepe through the pipe gates. Catch BTC, ETH, BNB and SOL.',
     'Space, ↑, W or click to flap.  P to pause.  M to mute.',
     'One point per gate, five per coin. Three lives. Good luck!',
     '',

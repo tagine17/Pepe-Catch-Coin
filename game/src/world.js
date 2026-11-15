@@ -32,7 +32,7 @@ export function createWorld(random) {
   const coins = [];
   for (let index = 0; index < POOL_SIZE; index += 1) {
     pipes.push({ active: false, x: 0, gapY: 0, gap: 0, passed: false, hasCoin: false });
-    coins.push({ active: false, x: 0, y: 0, spin: 0 });
+    coins.push({ active: false, x: 0, y: 0, spin: 0, kind: 0 });
   }
   const state = {
     pepe,
@@ -111,6 +111,7 @@ export function createWorld(random) {
         coin.x = pipe.x + PIPE.width / 2;
         coin.y = pipe.gapY;
         coin.spin = random() * Math.PI * 2;
+        coin.kind = Math.floor(random() * COIN.kinds);
       }
     }
   }

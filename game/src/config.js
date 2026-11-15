@@ -1,6 +1,6 @@
 // Every tuning number and colour in one place. The playfield is a fixed 1280x720 logical
 // area; the renderer scales it to the window, so no rule below depends on the screen size.
-// Pepe is a green frog who flaps through pipe gates and catches gold coins: one point per
+// Pepe is a green frog who flaps through pipe gates and catches crypto coins: one point per
 // gate passed, five per coin, three lives, and a medal at the end for a good run.
 
 export const FIELD = { width: 1280, height: 720, groundY: 664 };
@@ -38,10 +38,12 @@ export const PIPE = {
   passPoints: 1,
 };
 
-/** The gold coins that float in the gaps: worth five points each. */
+/** The crypto coins that float in the gaps: Bitcoin, Ethereum, BNB and Solana, worth five points each. */
 export const COIN = {
   radius: 15,
   points: 5,
+  /** How many coin kinds there are (see coinIcons.js). */
+  kinds: 4,
   /** Chance a gate carries a coin in its gap. */
   chance: 0.6,
 };

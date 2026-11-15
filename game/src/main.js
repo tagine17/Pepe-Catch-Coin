@@ -9,6 +9,7 @@ import { createRandom } from './random.js';
 import { createWorld, EVENT_COIN, EVENT_HIT, EVENT_OVER, EVENT_PASS } from './world.js';
 import { ACTION_FLAP, ACTION_MUTE, ACTION_PAUSE, createInput } from './input.js';
 import { createRenderer, SCREEN_OVER, SCREEN_PAUSED, SCREEN_PLAY, SCREEN_TITLE } from './render.js';
+import { coinIconsReady } from './coinIcons.js';
 import { createSound } from './sound.js';
 import { stageShot } from './shots.js';
 
@@ -58,7 +59,9 @@ function runShot(name) {
     if (painted < 2) requestAnimationFrame(paint);
     else window.__shotReady = true;
   }
-  requestAnimationFrame(paint);
+  // The coin icons decode asynchronously; wait for them so the shot shows the
+  // real icons instead of the gold-circle fallback.
+  coinIconsReady().then(() => requestAnimationFrame(paint));
 }
 
 function runGame() {
