@@ -12,12 +12,14 @@ const END_LIMIT_SECONDS = 600;
 
 /**
  * How far below the gap's centre Pepe may sink before the autopilot flaps: the play scene's
- * pilot is sharp and survives; the end scene's is sloppy, so it is caught out once the gates
- * speed up, as a hurried player is.
+ * pilot is sharp and survives; the end scene's pilot gets lazier the longer it flies, so it
+ * is caught out once the gates speed up, as a hurried player is.
  */
 const SLACK_PLAY = 6;
 const SLACK_END = 78;
-const TIRE_AFTER_SECONDS = 14;
+const SLACK_END_GROWTH_PER_SECOND = 8;
+const SLACK_END_MAX = 220;
+const TIRE_AFTER_SECONDS = 25;
 
 /** The next gate Pepe has not passed yet: the closest active pipe still ahead of him. */
 function nextGate(state) {
@@ -36,7 +38,7 @@ function autopilot(state, slack) {
   if (pepe.y + PEPE.radius > FIELD.groundY - 30) return true;
   const gate = nextGate(state);
   if (gate === null) return pepe.y > FIELD.height / 2 + 40 && pepe.vy > 0;
-  if (pepe.y > gate.gapY + 60) return true;
+  if (pepe.y > gate.gapY + 60 + slack) return true;
   return pepe.y > gate.gapY - 10 + slack && pepe.vy > -50;
 }
 
@@ -54,7 +56,9 @@ export function stageShot(name, world) {
   for (let step = 0; step < limit / STEP; step += 1) {
     const elapsed = step * STEP;
     let slack = SLACK_PLAY;
-    if (name === 'end' && elapsed > TIRE_AFTER_SECONDS) slack = SLACK_END;
+    if (name === 'end' && elapsed > TIRE_AFTER_SECONDS) {
+      slack = Math.min(SLACK_END_MAX, SLACK_END + (elapsed - TIRE_AFTER_SECONDS) * SLACK_END_GROWTH_PER_SECOND);
+    }
     if (world.step(STEP, autopilot(world.state, slack), false) & EVENT_OVER) break;
   }
   const over = world.state.lives === 0;

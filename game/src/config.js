@@ -12,9 +12,9 @@ export const STEP = 1 / 60;
 export const PEPE = {
   x: 300,
   radius: 26,
-  gravity: 2500,
-  flapVelocity: -540,
-  maxFall: 950,
+  gravity: 2300,
+  flapVelocity: -600,
+  maxFall: 900,
   /** Seconds of flashing safety after a hit. */
   invulnerable: 1.5,
 };
@@ -25,13 +25,13 @@ export const LIVES = 3;
 export const PIPE = {
   width: 96,
   /** Horizontal distance between one gate and the next. */
-  spacing: 400,
-  speed: 210,
-  speedPerLevel: 12,
-  maxSpeed: 330,
-  gap: 205,
-  gapPerLevel: 5,
-  minGap: 160,
+  spacing: 420,
+  speed: 195,
+  speedPerLevel: 10,
+  maxSpeed: 300,
+  gap: 220,
+  gapPerLevel: 4,
+  minGap: 180,
   /** How far from the top and the ground a gap's centre may sit. */
   topMargin: 170,
   bottomMargin: 120,
